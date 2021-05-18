@@ -7,11 +7,7 @@ from math import isnan
 import sklearn
 from scipy.stats import pearsonr
 from sklearn.linear_model import LogisticRegressionCV,LinearRegression
-from sklearn.neural_network import MLPClassifier
-from sklearn import svm
 from sklearn.metrics import classification_report
-from sklearn.model_selection import KFold
-from sklearn.ensemble import RandomForestClassifier
 
 # define data path
 feature_path = '/Users/anmin/Documents/AI_text_5000/textmind_features/feature_all.csv'
@@ -142,3 +138,42 @@ df = pd.DataFrame(data_array,columns=head)
 
 # save selected features
 df.to_csv('/Users/anmin/Documents/AI_text_5000/LIWC_LSTM/selected_feature0.001.csv')
+
+### prediction ##################################################################
+# sort out selected features from data
+path_selc_features = '/Users/anmin/Documents/AI_text_5000/LIWC_LSTM/selected_feature0.001.csv'
+selected_features = pd.read_csv(path_selc_features)
+selected_features = np.array(selected_features['feature'])
+
+# find the index of the features
+header_list = list(feature_df)
+feature_index = []
+for feature in selected_features:
+    feature_index.append(header_list.index(feature)-1)
+
+LR, LR_weights  = {}, {}
+
+for i in range(10):
+    matched_data = match_size(depress_feature,normal_feature)[:,feature_index]
+    X = matched_data
+    y = mood_array
+
+    ## Logistic Regression ######################################################
+    clf = LogisticRegressionCV(cv=10, random_state=0).fit(X, y)
+    predict_lable = clf.predict(X)
+    LR[i] = classification_report(y,predict_lable)
+
+    # weights of logistic regression
+    LR_weights[i] = clf.coef_[0] # regression coefficients of LR
+
+# calculate mean weight
+weight = np.zeros(LR_weights[0].shape)
+for i in range(10):
+    weight += LR_weights[i]
+weight_avg = weight/10
+
+# save csv file
+feature_weight = np.c_[selected_features,weight_avg]
+header_fw = ['feature','weight']
+df_fw = pd.DataFrame(feature_weight,columns=header_fw)
+df.to_csv('/Users/anmin/Documents/AI_text_5000/LIWC_LSTM/feature_weight0.001.csv')
