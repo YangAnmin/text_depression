@@ -127,23 +127,31 @@ for i in range(index.shape[0]):
 
 ## acquire header
 header_list = list(feature_df)
-selected_header = []
-for i in range(index.shape[0]):
-    selected_header.append(header_list[index[i][0]+1]) # omit the 1st column id,
+#selected_header = []
+#for i in range(index.shape[0]):
+    #selected_header.append(header_list[index[i][0]+1]) # omit the 1st column id,
                                                 # if the index of correlation is 2, then in header its index is 3
- # df of selected features
+selected_header = ['Funct','Pronoun','PPron','Verb','AuxVerb',
+                    'Adverb','Conj','Humans','Affect','NegEmo',
+                    'Inclusive','Exclusive','Bio','Body','Death',
+                    'Assent','We','QuanUnit','ProgM',
+                    'Anx','Sad','CogMech','Insight','Discrep',
+                    'Tentat','Certain','Motion','Religion','Colon']
+
+# df of selected features
 data_array = np.c_[selected_header,corr_value]
 head = ['feature','correlation_value']
 df = pd.DataFrame(data_array,columns=head)
 
 # save selected features
-df.to_csv('/Users/anmin/Documents/AI_text_5000/LIWC_LSTM/selected_feature0.001.csv')
+df.to_csv('/Users/anmin/Documents/AI_text_5000/LIWC_LSTM/selected_feature_zhu.csv')
 
 ### prediction ##################################################################
 # sort out selected features from data
-path_selc_features = '/Users/anmin/Documents/AI_text_5000/LIWC_LSTM/selected_feature0.001.csv'
-selected_features = pd.read_csv(path_selc_features)
-selected_features = np.array(selected_features['feature'])
+#path_selc_features = '/Users/anmin/Documents/AI_text_5000/LIWC_LSTM/selected_feature0.001.csv'
+#selected_features = pd.read_csv(path_selc_features)
+#selected_features = np.array(selected_features['feature'])
+selected_features = selected_header
 
 # find the index of the features
 header_list = list(feature_df)
@@ -176,4 +184,4 @@ weight_avg = weight/10
 feature_weight = np.c_[selected_features,weight_avg]
 header_fw = ['feature','weight']
 df_fw = pd.DataFrame(feature_weight,columns=header_fw)
-df.to_csv('/Users/anmin/Documents/AI_text_5000/LIWC_LSTM/feature_weight0.001.csv')
+df_fw.to_csv('/Users/anmin/Documents/AI_text_5000/LIWC_LSTM/feature_weight_all.csv')
